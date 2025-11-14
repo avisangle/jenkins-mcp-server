@@ -1,94 +1,72 @@
 # Jenkins MCP Server
 
-[![npm version](https://badge.fury.io/js/@ashwinighuge%2Fjenkins-mcp-server.svg)](https://badge.fury.io/js/@ashwinighuge%2Fjenkins-mcp-server)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![Node.js](https://img.shields.io/badge/Node.js-14.0+-green.svg)](https://nodejs.org/)
 
-An enterprise-grade MCP (Model Context Protocol) server for seamless Jenkins CI/CD integration. Enables AI assistants like Claude to interact with Jenkins through a comprehensive, production-ready API.
+An enterprise-grade MCP (Model Context Protocol) server for Jenkins CI/CD integration with advanced features including multi-tier caching, pipeline monitoring, artifact management, and batch operations.
 
-## 🚀 Quick Start
+## Features
 
-### npm Installation (Recommended)
+### Core Capabilities
+- **Job Management**: Trigger, list, search, and monitor Jenkins jobs with folder support
+- **Build Status**: Real-time build status tracking and console log streaming
+- **Pipeline Support**: Stage-by-stage pipeline execution monitoring with detailed logs
+- **Artifact Management**: List, download, and search build artifacts across builds
+- **Batch Operations**: Parallel job execution with priority queuing
+- **Advanced Filtering**: Filter jobs by status, results, dates, and more with regex support
 
-```bash
-# Global installation
-npm install -g @ashwinighuge/jenkins-mcp-server
+### Performance & Reliability
+- **Multi-Tier Caching System**: 5-tier intelligent caching (static, semi-static, dynamic, short-lived, permanent)
+- **Retry Logic**: Built-in exponential backoff for improved reliability
+- **CSRF Protection**: Automatic crumb token handling
+- **Input Validation**: Robust Pydantic-based validation
 
-# Or use directly with npx
-npx @ashwinighuge/jenkins-mcp-server --help
-```
+### Enterprise Features
+- **Nested Job Support**: Full support for Jenkins folder structures
+- **2FA Compatible**: Works with Jenkins two-factor authentication
+- **Queue Management**: Real-time build queue monitoring
+- **Transport Flexibility**: Supports STDIO and Streamable HTTP transports
 
-### Claude Desktop Integration
-
-Add to your `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "jenkins": {
-      "command": "jenkins-mcp",
-      "env": {
-        "JENKINS_URL": "http://your-jenkins-server:8080",
-        "JENKINS_USER": "your-username",
-        "JENKINS_API_TOKEN": "your-api-token"
-      }
-    }
-  }
-}
-```
-
-## ✨ Features
-
-- **🔧 Job Management**: Trigger, list, search, and monitor Jenkins jobs with full folder support
-- **📊 Build Status**: Real-time build status tracking and console log streaming
-- **🔄 Pipeline Support**: Stage-by-stage pipeline execution monitoring with detailed logs
-- **📦 Artifact Management**: List, download, and search build artifacts across multiple builds
-- **⚡ Batch Operations**: Parallel job execution with intelligent priority queuing
-- **🚀 Performance Caching**: Multi-tier intelligent caching system with automatic invalidation
-- **🔍 Advanced Filtering**: Filter jobs by status, results, dates, and more with regex support
-- **📋 Queue Management**: Real-time build queue monitoring and management
-- **🔒 Enterprise Security**: CSRF protection, 2FA support, and secure authentication
-- **🌐 Cross-Platform**: Works on Windows, macOS, and Linux
-- **🔄 Retry Logic**: Built-in exponential backoff for improved reliability
-- **📡 Transport Flexibility**: Supports both STDIO and HTTP transports
-- **✅ Input Validation**: Robust Pydantic-based validation and error handling
-
-## 📋 Prerequisites
+## Prerequisites
 
 - **Node.js**: 14.0.0 or higher
 - **Python**: 3.12 or higher
 - **Jenkins**: 2.401+ (recommended)
-- **Jenkins API Token**: For authentication
+- **Jenkins API Token**: Required for authentication
 
-## 🛠 Installation Methods
+## Installation
 
-### Method 1: npm (Recommended)
-
-```bash
-# Install globally for system-wide access
-npm install -g @ashwinighuge/jenkins-mcp-server
-
-# Verify installation
-jenkins-mcp --help
-```
-
-### Method 2: Development Setup
+### Clone and Install
 
 ```bash
-# Clone the repository
-git clone https://github.com/AshwiniGhuge3012/jenkins-mcp-server
+# Clone this repository
+git clone https://github.com/avisangle/jenkins-mcp-server
 cd jenkins-mcp-server
 
 # Install Node.js dependencies
 npm install
 
 # Install Python dependencies
-pip install -r requirements.txt  # or use uv pip install
+pip install -e .
+# Or using uv (recommended)
+uv pip install -e .
 
-# Run locally
+# Verify installation
 node bin/jenkins-mcp.js --help
 ```
 
-## 🔐 Configuration
+### Dependencies
+
+**Python packages** (automatically installed):
+- `mcp[cli]>=1.11.0` - Model Context Protocol
+- `requests>=2.32.4` - HTTP library
+- `cachetools>=5.5.0` - Caching utilities
+- `python-dotenv` - Environment variable management
+- `pydantic` - Data validation
+- `fastapi` - HTTP transport support
+
+## Configuration
 
 ### Environment Variables
 
@@ -100,345 +78,487 @@ JENKINS_URL="http://your-jenkins-server:8080"
 JENKINS_USER="your-username"
 JENKINS_API_TOKEN="your-api-token"
 
-# Optional: Server Configuration
-MCP_PORT=8010
-MCP_HOST=0.0.0.0
-
 # Optional: Retry Configuration
 JENKINS_MAX_RETRIES=3
 JENKINS_RETRY_BASE_DELAY=1.0
 JENKINS_RETRY_MAX_DELAY=60.0
 JENKINS_RETRY_BACKOFF_MULTIPLIER=2.0
 
-# Optional: Performance Cache Configuration
-JENKINS_CACHE_STATIC_TTL=3600        # 1 hour
-JENKINS_CACHE_SEMI_STATIC_TTL=300    # 5 minutes
-JENKINS_CACHE_DYNAMIC_TTL=30         # 30 seconds
-JENKINS_CACHE_SHORT_TTL=10           # 10 seconds
-JENKINS_CACHE_STATIC_SIZE=1000       # Max cached items
+# Optional: Cache Configuration
+JENKINS_CACHE_STATIC_TTL=3600        # 1 hour for static data
+JENKINS_CACHE_SEMI_STATIC_TTL=300    # 5 minutes for semi-static
+JENKINS_CACHE_DYNAMIC_TTL=30         # 30 seconds for dynamic data
+JENKINS_CACHE_SHORT_TTL=10           # 10 seconds for short-lived
+
+# Optional: Cache Size Limits
+JENKINS_CACHE_STATIC_SIZE=1000
 JENKINS_CACHE_SEMI_STATIC_SIZE=500
 JENKINS_CACHE_DYNAMIC_SIZE=200
 JENKINS_CACHE_PERMANENT_SIZE=2000
 JENKINS_CACHE_SHORT_SIZE=100
+
+# Optional: Content Limits
+JENKINS_MAX_LOG_SIZE=1000
+JENKINS_MAX_CONTENT_SIZE=10000
+JENKINS_MAX_ARTIFACT_SIZE_MB=50
+
+# Optional: Server Configuration
+MCP_PORT=8010
+MCP_HOST=0.0.0.0
 ```
 
-### Getting Jenkins API Token
+### Getting a Jenkins API Token
 
-1. Log into your Jenkins instance
-2. Click your username → **Configure**
-3. Scroll to **API Token** section
-4. Click **Add new Token**
-5. Give it a name and click **Generate**
-6. Copy the generated token (save it securely!)
+1. Log into your Jenkins server
+2. Click on your username → **Configure**
+3. Under **API Token** section, click **Add new Token**
+4. Give it a name and click **Generate**
+5. Copy the generated token (you won't be able to see it again)
 
-## 🚀 Usage
+## Usage
 
-### Command Line Interface
+### Claude Desktop Integration
+
+Add to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "jenkins": {
+      "command": "node",
+      "args": [
+        "/path/to/jenkins-mcp-server/bin/jenkins-mcp.js"
+      ],
+      "env": {
+        "JENKINS_URL": "http://your-jenkins-server:8080",
+        "JENKINS_USER": "your-username",
+        "JENKINS_API_TOKEN": "your-api-token"
+      }
+    }
+  }
+}
+```
+
+### Command Line
 
 ```bash
-# STDIO mode (default, for Claude Desktop)
-jenkins-mcp
+# STDIO mode (for Claude Desktop/MCP clients)
+node bin/jenkins-mcp.js
 
 # HTTP mode (for MCP Gateway)
-jenkins-mcp --transport streamable-http --port 8010
+node bin/jenkins-mcp.js --transport streamable-http --port 8010
 
-# Custom host and port
-jenkins-mcp --transport streamable-http --host localhost --port 9000
-
-# Show help
-jenkins-mcp --help
+# With custom host
+node bin/jenkins-mcp.js --transport streamable-http --port 8080 --host localhost
 ```
 
 ### Transport Modes
 
-| Mode | Use Case | Command |
-|------|----------|---------|
-| **STDIO** | Claude Desktop, direct MCP clients | `jenkins-mcp` |
-| **HTTP** | MCP Gateway, web integrations | `jenkins-mcp --transport streamable-http` |
+**STDIO Mode** (default):
+- Standard input/output communication
+- Best for Claude Desktop integration
+- No network ports required
 
-### Advanced Usage Examples
-
-```bash
-# Using with npx (no global installation)
-npx @ashwinighuge/jenkins-mcp-server
-
-# Using environment variables
-JENKINS_URL=http://localhost:8080 JENKINS_USER=admin JENKINS_API_TOKEN=abc123 jenkins-mcp
-
-# HTTP mode with custom configuration
-jenkins-mcp --transport streamable-http --host 0.0.0.0 --port 8080
-```
+**Streamable HTTP Mode**:
+- HTTP-based communication
+- Useful for MCP Gateway or remote connections
+- Requires port configuration
 
 ## Available Tools
 
-Here is a list of the tools exposed by this MCP server:
+The server exposes 21 MCP tools for Jenkins interaction:
 
-### `trigger_job`
-- **Description**: Triggers a Jenkins job with optional parameters.
-- **Parameters**:
-    - `job_name` (string): The name of the Jenkins job.
-    - `params` (object, optional): Job parameters as a JSON object. For multiselect parameters, pass an array of strings.
-- **Returns**: A confirmation message with the queue URL.
+### Job Management
 
-### `get_job_info`
-- **Description**: Gets detailed information about a Jenkins job, including its parameters.
-- **Parameters**:
-    - `job_name` (string): The name of the Jenkins job.
-- **Returns**: An object containing the job's description, parameters, and last build number.
+#### `trigger_job`
+Trigger a Jenkins job with optional parameters.
 
-### `get_build_status`
-- **Description**: Gets the status of a specific build.
-- **Parameters**:
-    - `job_name` (string): The name of the Jenkins job.
-    - `build_number` (integer): The build number.
-- **Returns**: An object with the build status, timestamp, duration, and URL.
+**Parameters:**
+- `job_name` (string): Job name or path (e.g., `"my-job"` or `"folder/my-job"`)
+- `params` (object, optional): Job parameters as key-value pairs
 
-### `get_console_log`
-- **Description**: Retrieves the console log for a specific build.
-- **Parameters**:
-    - `job_name` (string): The name of the Jenkins job.
-    - `build_number` (integer): The build number.
-    - `start` (integer, optional): The starting byte position for fetching the log.
-- **Returns**: The console log text and information about whether more data is available.
-
-### `list_jobs`
-- **Description**: Lists all available jobs on the Jenkins server with advanced filtering capabilities.
-- **Parameters**:
-    - `recursive` (boolean, optional): If True, recursively traverse folders (default: True)
-    - `max_depth` (integer, optional): Maximum depth to recurse (default: 10)
-    - `include_folders` (boolean, optional): Whether to include folder items (default: False)
-    - `status_filter` (string, optional): Filter by job status: "building", "queued", "idle", "disabled"
-    - `last_build_result` (string, optional): Filter by last build result: "SUCCESS", "FAILURE", "UNSTABLE", "ABORTED", "NOT_BUILT"
-    - `days_since_last_build` (integer, optional): Only jobs built within the last N days
-    - `enabled_only` (boolean, optional): If True, only enabled jobs; if False, only disabled jobs
-- **Returns**: A list of jobs with enhanced metadata including build status and timestamps.
-
-### `search_jobs`
-- **Description**: Search for Jenkins jobs using pattern matching with advanced filtering.
-- **Parameters**:
-    - `pattern` (string): Pattern to match job names (supports wildcards like 'build*', '*test*', etc.)
-    - `job_type` (string, optional): Filter by type - "job", "folder", or "all" (default: "job")
-    - `max_depth` (integer, optional): Maximum depth to search (default: 10)
-    - `use_regex` (boolean, optional): If True, treat pattern as regex instead of wildcard (default: False)
-    - `status_filter` (string, optional): Filter by job status: "building", "queued", "idle", "disabled"
-    - `last_build_result` (string, optional): Filter by last build result: "SUCCESS", "FAILURE", "UNSTABLE", "ABORTED", "NOT_BUILT"
-    - `days_since_last_build` (integer, optional): Only jobs built within the last N days
-    - `enabled_only` (boolean, optional): If True, only enabled jobs; if False, only disabled jobs
-- **Returns**: A list of matching jobs with enhanced metadata and full paths.
-
-### `get_queue_info`
-- **Description**: Gets information about builds currently in the queue.
-- **Parameters**: None
-- **Returns**: A list of items in the queue.
-
-### `server_info`
-- **Description**: Gets basic information about the Jenkins server.
-- **Parameters**: None
-- **Returns**: The Jenkins version and URL.
-
-### `get_pipeline_status`
-- **Description**: Gets detailed pipeline stage status for Jenkins Pipeline job builds.
-- **Parameters**:
-    - `job_name` (string): The name of the Jenkins Pipeline job.
-    - `build_number` (integer): The build number.
-- **Returns**: Pipeline execution details including stage-by-stage status, timing, duration, and logs.
-
-### `list_build_artifacts`
-- **Description**: List all artifacts for a specific Jenkins build.
-- **Parameters**:
-    - `job_name` (string): Name of the Jenkins job.
-    - `build_number` (integer): Build number to list artifacts for.
-- **Returns**: Information about all artifacts including filenames, sizes, and download URLs.
-
-### `download_build_artifact`
-- **Description**: Download a specific build artifact content (text-based artifacts only for safety).
-- **Parameters**:
-    - `job_name` (string): Name of the Jenkins job.
-    - `build_number` (integer): Build number containing the artifact.
-    - `artifact_path` (string): Relative path to the artifact (from list_build_artifacts).
-    - `max_size_mb` (integer, optional): Maximum file size to download in MB (default: 50MB).
-- **Returns**: Artifact content (for text files) or download information.
-
-### `search_build_artifacts`
-- **Description**: Search for artifacts across recent builds of a job using pattern matching.
-- **Parameters**:
-    - `job_name` (string): Name of the Jenkins job to search.
-    - `pattern` (string): Pattern to match artifact names (wildcards or regex).
-    - `max_builds` (integer, optional): Maximum number of recent builds to search (default: 10).
-    - `use_regex` (boolean, optional): If True, treat pattern as regex instead of wildcard (default: False).
-- **Returns**: List of matching artifacts across builds with their metadata.
-
-### `batch_trigger_jobs`
-- **Description**: Trigger multiple Jenkins jobs in batch with parallel execution and priority queuing.
-- **Parameters**:
-    - `operations` (array): List of job operations, each containing:
-        - `job_name` (string): Name of the Jenkins job
-        - `params` (object, optional): Job parameters
-        - `priority` (integer, optional): Priority 1-10 (1=highest, default: 1)
-    - `max_concurrent` (integer, optional): Maximum concurrent job triggers (default: 5)
-    - `fail_fast` (boolean, optional): Stop processing on first failure (default: false)
-    - `wait_for_completion` (boolean, optional): Wait for all jobs to complete (default: false)
-- **Returns**: Batch operation response with operation ID, results, and execution statistics.
-
-### `batch_monitor_jobs`
-- **Description**: Monitor the status of a batch operation and its individual jobs.
-- **Parameters**:
-    - `operation_id` (string): The operation ID returned from batch_trigger_jobs.
-- **Returns**: Current status of the batch operation including progress and individual job statuses.
-
-### `batch_cancel_jobs`
-- **Description**: Cancel a batch operation and optionally cancel running builds.
-- **Parameters**:
-    - `operation_id` (string): The operation ID to cancel.
-    - `cancel_running_builds` (boolean, optional): Attempt to cancel running builds (default: false).
-- **Returns**: Cancellation status and results.
-
-### `get_cache_statistics`
-- **Description**: Get comprehensive cache performance metrics and utilization statistics.
-- **Parameters**: None
-- **Returns**: Cache hit rates, utilization percentages, and detailed statistics for all cache types.
-
-### `clear_cache`
-- **Description**: Clear caches with fine-grained control for performance management.
-- **Parameters**:
-    - `cache_type` (string, optional): Type of cache to clear ('all', 'static', 'semi_static', 'dynamic', 'permanent', 'short')
-    - `job_name` (string, optional): Clear caches for a specific job only
-- **Returns**: Confirmation of cache clearing operation.
-
-### `warm_cache`
-- **Description**: Pre-load frequently accessed data into caches for improved performance.
-- **Parameters**:
-    - `operations` (array, optional): Operations to warm ('server_info', 'job_list', 'queue_info')
-- **Returns**: Results of cache warming operations with success/failure status.
-
-### `summarize_build_log`
-- **Description**: (Demonstration) Summarizes a build log using a pre-configured LLM prompt.
-- **Parameters**:
-    - `job_name` (string): The name of the Jenkins job.
-    - `build_number` (integer): The build number.
-- **Returns**: A placeholder summary and the prompt that would be used.
-
-## 💡 Usage Examples
-
-### With Claude Desktop
-
-Once configured in `claude_desktop_config.json`, you can ask Claude:
-
-> "List all Jenkins jobs"
-> 
-> "Trigger the deploy-prod job with version parameter 1.2.3"
-> 
-> "Show me the console log for build #45 of the api-tests job"
-> 
-> "What's the status of all jobs that failed in the last 24 hours?"
-
-### With MCP Gateway
-
-```bash
-# Start server in HTTP mode
-jenkins-mcp --transport streamable-http --port 8010
-
-# Example API calls (using curl)
-curl -X POST http://localhost:8010/mcp \
-  -H "Content-Type: application/json" \
-  -d '{"method": "tools/call", "params": {"name": "list_jobs", "arguments": {}}}'
-```
-
-### Batch Operations Example
-
-```bash
-# Trigger multiple jobs with different priorities
-jenkins-mcp # Then use batch_trigger_jobs tool with:
+**Example:**
+```json
 {
-  "operations": [
-    {"job_name": "unit-tests", "priority": 1},
-    {"job_name": "integration-tests", "priority": 2},
-    {"job_name": "deploy-staging", "priority": 3}
-  ],
-  "max_concurrent": 3,
-  "wait_for_completion": true
+  "job_name": "build-project",
+  "params": {
+    "BRANCH": "main",
+    "VERSION": "1.0.0"
+  }
 }
 ```
 
-## 🔧 Troubleshooting
+#### `get_job_info`
+Get detailed information about a Jenkins job.
+
+**Parameters:**
+- `job_name` (string): Job name or path
+- `auto_search` (boolean, default: true): Perform pattern search if direct lookup fails
+
+**Returns:** Job configuration, parameters, last build info, and health status
+
+#### `list_jobs`
+List Jenkins jobs with advanced filtering.
+
+**Parameters:**
+- `recursive` (boolean, default: true): Include jobs in subfolders
+- `max_depth` (integer, default: 10): Maximum folder depth
+- `include_folders` (boolean, default: false): Include folder items
+- `status_filter` (string, optional): Filter by color (e.g., `"blue"`, `"red"`)
+- `last_build_result` (string, optional): Filter by result (`"SUCCESS"`, `"FAILURE"`, `"UNSTABLE"`)
+- `days_since_last_build` (integer, optional): Filter by days since last build
+- `enabled_only` (boolean, optional): Show only enabled jobs
+
+**Returns:** Hierarchical list of jobs with statistics
+
+#### `search_jobs`
+Search for Jenkins jobs by pattern.
+
+**Parameters:**
+- `pattern` (string): Search pattern (supports wildcards)
+- `job_type` (string, default: `"job"`): Type filter (`"job"`, `"folder"`, `"pipeline"`)
+- `use_regex` (boolean, default: false): Use regex pattern matching
+- `max_depth` (integer, default: 10): Maximum search depth
+
+**Returns:** List of matching jobs with details
+
+#### `search_and_trigger`
+Search for jobs and trigger all matches.
+
+**Parameters:**
+- `pattern` (string): Search pattern
+- `params` (object, optional): Parameters for all jobs
+- `max_depth` (integer, default: 10): Maximum search depth
+
+**Returns:** Trigger status for each matched job
+
+#### `get_folder_info`
+Get information about a Jenkins folder.
+
+**Parameters:**
+- `folder_path` (string): Folder path (e.g., `"team/project"`)
+
+**Returns:** Folder details and contained jobs
+
+### Build Status & Monitoring
+
+#### `get_build_status`
+Get status of a specific build.
+
+**Parameters:**
+- `job_name` (string): Job name or path
+- `build_number` (integer): Build number
+
+**Returns:** Build status, result, duration, timestamp, and executor info
+
+#### `get_console_log`
+Get console output from a build.
+
+**Parameters:**
+- `job_name` (string): Job name or path
+- `build_number` (integer): Build number
+- `start` (integer, default: 0): Starting byte offset
+
+**Returns:** Console log content and metadata
+
+#### `summarize_build_log`
+Get a summarized version of build console log.
+
+**Parameters:**
+- `job_name` (string): Job name or path
+- `build_number` (integer): Build number
+
+**Returns:** Summarized log content
+
+### Pipeline Support
+
+#### `get_pipeline_status`
+Get detailed pipeline execution status with stage information.
+
+**Parameters:**
+- `job_name` (string): Pipeline job name
+- `build_number` (integer): Build number
+
+**Returns:** Pipeline stages with status, duration, and logs for each stage
+
+### Artifact Management
+
+#### `list_build_artifacts`
+List all artifacts from a build.
+
+**Parameters:**
+- `job_name` (string): Job name or path
+- `build_number` (integer): Build number
+
+**Returns:** List of artifacts with paths, sizes, and download URLs
+
+#### `download_build_artifact`
+Download a specific build artifact.
+
+**Parameters:**
+- `job_name` (string): Job name or path
+- `build_number` (integer): Build number
+- `artifact_path` (string): Relative path to artifact
+- `max_size_mb` (integer, default: 50): Maximum download size in MB
+
+**Returns:** Artifact content (base64 encoded for binary) or text content
+
+#### `search_build_artifacts`
+Search for artifacts across multiple builds.
+
+**Parameters:**
+- `job_name` (string): Job name or path
+- `pattern` (string): Search pattern for artifact names
+- `max_builds` (integer, default: 10): Maximum builds to search
+- `use_regex` (boolean, default: false): Use regex matching
+
+**Returns:** List of matching artifacts across builds
+
+### Batch Operations
+
+#### `batch_trigger_jobs`
+Trigger multiple jobs in parallel with priority queuing.
+
+**Parameters:**
+- `operations` (array): List of job operations
+  - `job_name` (string): Job name
+  - `params` (object, optional): Job parameters
+  - `priority` (integer, default: 0): Execution priority (higher = earlier)
+- `max_concurrent` (integer, default: 5): Maximum parallel executions
+- `operation_name` (string, optional): Name for this batch operation
+
+**Returns:** Operation ID for monitoring
+
+**Example:**
+```json
+{
+  "operations": [
+    {"job_name": "build-frontend", "priority": 10},
+    {"job_name": "build-backend", "priority": 10},
+    {"job_name": "integration-tests", "priority": 5}
+  ],
+  "max_concurrent": 2
+}
+```
+
+#### `batch_monitor_jobs`
+Monitor the status of a batch operation.
+
+**Parameters:**
+- `operation_id` (string): Operation ID from batch_trigger_jobs
+
+**Returns:** Status of each job in the batch operation
+
+#### `batch_cancel_jobs`
+Cancel a batch operation.
+
+**Parameters:**
+- `operation_id` (string): Operation ID to cancel
+- `cancel_running_builds` (boolean, default: false): Also cancel running builds
+
+**Returns:** Cancellation status
+
+### Queue & Server Management
+
+#### `get_queue_info`
+Get information about the Jenkins build queue.
+
+**Returns:** List of queued items with job names, wait times, and reasons
+
+#### `server_info`
+Get basic Jenkins server information.
+
+**Returns:** Version, root URL, and system information
+
+### Cache Management
+
+#### `get_cache_statistics`
+Get statistics about the caching system.
+
+**Returns:** Cache hit/miss rates, sizes, and memory usage
+
+#### `clear_cache`
+Clear cached data.
+
+**Parameters:**
+- `cache_type` (string, optional): Specific cache to clear (`"static"`, `"dynamic"`, etc.)
+- `job_name` (string, optional): Clear cache for specific job
+
+**Returns:** Cache clear status
+
+#### `warm_cache`
+Pre-populate cache with commonly used data.
+
+**Parameters:**
+- `operations` (array, optional): List of operations to warm (`["list_jobs"`, `"server_info"]`)
+
+**Returns:** Warm-up status and timing
+
+## Caching System
+
+The server implements a sophisticated 5-tier caching system for optimal performance:
+
+### Cache Tiers
+
+| Tier | TTL | Use Case | Example Data |
+|------|-----|----------|--------------|
+| **Static** | 1 hour | Rarely changing data | Job definitions, server info |
+| **Semi-Static** | 5 minutes | Occasionally changing | Job lists, folder structures |
+| **Dynamic** | 30 seconds | Frequently changing | Build statuses, queue info |
+| **Short-Lived** | 10 seconds | Real-time data | Active build logs |
+| **Permanent** | No expiry | Immutable data | Completed build artifacts |
+
+### Cache Invalidation
+
+Caches are automatically invalidated when:
+- Jobs are triggered
+- Build states change
+- Manual cache clear operations
+
+### Cache Configuration
+
+Customize cache behavior via environment variables (see Configuration section).
+
+## Error Handling
+
+The server provides detailed error messages with suggestions:
+
+- **404 Not Found**: Includes search suggestions for similar job names
+- **401 Unauthorized**: Prompts to check credentials
+- **403 Forbidden**: Explains permission issues
+- **Connection Errors**: Automatic retry with exponential backoff
+
+## Nested Job Support
+
+Fully supports Jenkins folder structures:
+
+```json
+{
+  "job_name": "team-alpha/backend/build-service"
+}
+```
+
+All tools accept nested paths with automatic path handling.
+
+## Performance Optimization
+
+### Built-in Optimizations
+- Multi-tier intelligent caching
+- Concurrent batch operations with throttling
+- Request deduplication
+- Lazy loading of large datasets
+- Configurable content size limits
+
+### Best Practices
+1. Use batch operations for multiple jobs
+2. Enable caching for repeated operations
+3. Set appropriate `max_depth` when searching
+4. Use `status_filter` to reduce data transfer
+5. Warm cache before high-traffic periods
+
+## Security
+
+### Authentication
+- Jenkins API token authentication
+- Support for Jenkins 2FA environments
+- Automatic CSRF crumb token handling
+
+### Security Features
+- No password storage (API tokens only)
+- TLS/SSL support for Jenkins HTTPS endpoints
+- Input validation on all parameters
+- Configurable artifact download size limits
+
+## Troubleshooting
 
 ### Common Issues
 
-**Python Dependencies**
+**Python version error:**
 ```bash
-# If Python packages fail to install automatically
-pip install mcp[cli] pydantic requests python-dotenv fastapi cachetools
-
-# Or using uv (recommended)
-uv pip install mcp[cli] pydantic requests python-dotenv fastapi cachetools
+# Check Python version
+python3 --version  # Must be 3.12+
 ```
 
-**Permission Issues (Linux/macOS)**
+**Missing dependencies:**
 ```bash
-# If permission denied
-sudo npm install -g @ashwinighuge/jenkins-mcp-server
-
-# Or use user-level installation
-npm install -g @ashwinighuge/jenkins-mcp-server --prefix ~/.local
+# Reinstall Python packages
+pip install -e .
+# Or
+uv pip install -e .
 ```
 
-**Jenkins Connection Issues**
-- Verify `JENKINS_URL` is accessible
-- Ensure API token is valid and not expired
-- Check firewall/proxy settings
-- For HTTPS, verify SSL certificates
+**Connection refused:**
+- Verify `JENKINS_URL` is correct and accessible
+- Check Jenkins server is running
+- Verify network connectivity
 
-**2FA/CSRF Issues**
-- The server handles CSRF tokens automatically
-- For 2FA environments, use API tokens (not passwords)
-- Email OTP and similar 2FA methods are supported
+**Authentication failed:**
+- Regenerate Jenkins API token
+- Check `JENKINS_USER` matches your Jenkins username
+- Verify token has necessary permissions
 
-### Debug Mode
+**Job not found:**
+- Check job name spelling and case
+- Use `search_jobs` to find correct job name
+- Verify you have permissions to access the job
 
-```bash
-# Enable verbose logging
-DEBUG=jenkins-mcp jenkins-mcp
+### Debug Logging
 
-# Check Python dependencies
-jenkins-mcp --help  # Will validate dependencies
+The server logs to stderr with request IDs for troubleshooting:
+
+```
+2025-11-12 10:30:45 - jenkins_mcp - INFO - [req-abc123] Received request to trigger job: 'build-project'
 ```
 
-## 📊 Performance Features
+## Development
 
-- **Multi-tier Caching**: Intelligent caching with automatic invalidation
-- **Batch Processing**: Parallel job execution with priority queuing
-- **Retry Logic**: Exponential backoff for network reliability
-- **Connection Pooling**: Efficient HTTP connection management
-- **Memory Optimization**: Configurable cache sizes and TTL values
+### Running Tests
 
-## 🤝 Contributing
+```bash
+# Install test dependencies
+pip install -e ".[test]"
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+# Run tests
+pytest
+```
 
-## 📄 License
+### Project Structure
 
-This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
+```
+jenkins-mcp-server/
+├── bin/
+│   └── jenkins-mcp.js          # Node.js CLI entry point
+├── python/
+│   └── jenkins_mcp_server_enhanced.py  # Main MCP server implementation
+├── scripts/
+│   └── check-python.js         # Python environment checker
+├── .env.example                # Example environment configuration
+├── pyproject.toml              # Python package configuration
+├── package.json                # Node.js package configuration
+└── README.md                   # This file
+```
 
-## 🙋‍♂️ Support
+## Contributing
 
-- **Documentation**: [GitHub README](https://github.com/AshwiniGhuge3012/jenkins-mcp-server#readme)
-- **Issues**: [GitHub Issues](https://github.com/AshwiniGhuge3012/jenkins-mcp-server/issues)
-- **npm Package**: [@ashwinighuge/jenkins-mcp-server](https://www.npmjs.com/package/@ashwinighuge/jenkins-mcp-server)
+Contributions, bug reports, and feature requests are welcome.
 
-## 🏗️ Architecture
+## License
 
-Built with:
-- **Python 3.12+** - Core server implementation
-- **FastMCP** - MCP protocol handling
-- **Node.js** - Cross-platform wrapper and process management
-- **Pydantic** - Data validation and serialization
-- **Requests** - HTTP client with retry logic
-- **CacheTools** - Multi-tier performance caching
+Apache License 2.0 - See [LICENSE](LICENSE) file for details.
+
+## Related Projects
+
+- **MCP Protocol**: [Model Context Protocol](https://modelcontextprotocol.io/)
+- **Claude Desktop**: [Anthropic Claude](https://www.anthropic.com/claude)
+
+## Support
+
+For issues and questions:
+- Open an issue on [GitHub Issues](https://github.com/avisangle/jenkins-mcp-server/issues)
+- Check existing issues for solutions
+- Provide Jenkins version, MCP server version, and error logs when reporting issues
 
 ---
 
-
+**Version**: 1.0.7
+**Last Updated**: 2025-11-13
